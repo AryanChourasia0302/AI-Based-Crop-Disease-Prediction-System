@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Verdant — AI Crop Management</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f6ee;
+    color: #193b2a;
+}
+
+header {
+    height: 98px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 7%;
+    background: #f5f6ee;
+    border-bottom: 1px solid #ddd;
+}
+
+.logo {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+nav {
+    display: flex;
+    gap: 45px;
+    color: #586354;
+    font-size: 18px;
+}
+
+.button {
+    background: #17613f;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+main {
+    max-width: 1100px;
+    margin: 50px auto;
+    padding: 0 25px;
+}
+
+/* UPLOAD CARD */
+
+.upload-card {
+    background: white;
+    border: 1px solid #d8dcd1;
+    border-radius: 25px;
+    padding: 40px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.upload-card h1 {
+    font-family: Georgia, serif;
+    font-size: 34px;
+    margin-top: 0;
+}
+
+.upload-card p {
+    color: #687268;
+    font-size: 17px;
+}
+
+.drop-zone {
+    margin: 30px auto;
+    max-width: 650px;
+    min-height: 220px;
+    border: 2px dashed #8da493;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 25px;
+    cursor: pointer;
+    background: #f8faf5;
+}
+
+.drop-zone:hover {
+    background: #f0f5ed;
+}
+
+.upload-icon {
+    font-size: 55px;
+    margin-bottom: 10px;
+}
+
+#imageInput {
+    display: none;
+}
+
+#preview {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 15px;
+    display: none;
+    margin: auto;
+}
+
+.analyze-btn {
+    background: #17613f;
+    color: white;
+    border: none;
+    padding: 16px 35px;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.analyze-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.clear-btn {
+    background: #e8ece4;
+    color: #193b2a;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+/* RESULT */
+
+#resultSection {
+    display: none;
+}
+
+.result-card {
+    background: #eef0e6;
+    border: 1px solid #d4d8cb;
+    border-radius: 25px;
+    padding: 35px;
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+h2 {
+    margin: 0;
+    font-family: Georgia, serif;
+    font-size: 30px;
+}
+
+.confidence {
+    background: #f6dfd1;
+    color: #ad4c12;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-weight: bold;
+}
+
+.progress {
+    height: 9px;
+    background: #d4d7ce;
+    border-radius: 10px;
+    margin: 28px 0 35px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 96%;
+    background: #218256;
+}
+
+.section-title {
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: #758073;
+    margin-bottom: 20px;
+}
+
+.advisory {
+    background: white;
+    border-radius: 20px;
+    padding: 28px;
+    border: 1px solid #d8dcd1;
+}
+
+.advisory h3 {
+    margin-top: 0;
+    font-family: Georgia, serif;
+    font-size: 26px;
+}
+
+.question {
+    border-bottom: 1px solid #ddd;
+    padding: 18px 0;
+}
+
+.question:last-child {
+    border-bottom: none;
+}
+
+.question button {
+    width: 100%;
+    border: none;
+    background: none;
+    text-align: left;
+    font-size: 18px;
+    font-weight: bold;
+    color: #193b2a;
+    cursor: pointer;
+    padding: 5px 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.answer {
+    display: none;
+    color: #566057;
+    line-height: 1.7;
+    padding: 12px 25px 5px 0;
+    font-size: 16px;
+}
+
+.loading {
+    padding: 20px 0;
+    color: #17613f;
+    font-weight: bold;
+    display: none;
+}
+
+.error {
+    color: #b33a2b;
+    background: #fce8e5;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+@media(max-width:700px) {
+
+    header {
+        padding: 0 20px;
+    }
+
+    nav {
+        display: none;
+    }
+
+    main {
+        margin-top: 25px;
+    }
+
+    .result-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .upload-card {
+        padding: 25px;
+    }
+
+    .clear-btn {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">🌿 Verdant</div>
+
+<nav>
+<span>How it works</span>
+<span>Why Verdant</span>
+<span>Predictor</span>
+</nav>
+
+<button class="button" onclick="scrollToUpload()">
+Try the predictor
+</button>
+
+</header>
+
+
+<main>
+
+<!-- ========================= -->
+<!-- IMAGE UPLOAD -->
+<!-- ========================= -->
+
+<div class="upload-card" id="uploadSection">
+
+<h1>🌱 AI Crop Health Predictor</h1>
+
+<p>
+Upload a clear image of your crop leaf and get an AI-powered
+crop health assessment.
+</p>
+
+<div class="drop-zone" onclick="document.getElementById('imageInput').click()">
+
+<div class="upload-icon">📷</div>
+
+<strong>Click to upload crop image</strong>
+
+<p>PNG, JPG or JPEG</p>
+
+<input
+type="file"
+id="imageInput"
+accept="image/png,image/jpeg,image/jpg"
+>
+
+<img id="preview">
+
+</div>
+
+<div>
+
+<button
+class="analyze-btn"
+id="analyzeBtn"
+disabled
+onclick="analyzeImage()"
+>
+🔍 Analyze Crop
+</button>
+
+<button
+class="clear-btn"
+onclick="clearImage()"
+>
+Clear
+</button>
+
+</div>
+
+<div id="uploadError"></div>
+
+<div id="predictionLoading" class="loading">
+🌿 Analyzing your crop...
+</div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- RESULT -->
+<!-- ========================= -->
+
+<div id="resultSection">
+
+<div class="result-card">
+
+<div class="result-header">
+
+<h2 id="diseaseTitle">
+Crop Disease
+</h2>
+
+<div class="confidence" id="confidence">
+Prediction
+</div>
+
+</div>
+
+<div class="progress">
+<div
+class="progress-bar"
+id="progressBar"
+></div>
+</div>
+
+<div class="section-title">
+AI CROP ADVISORY
+</div>
+
+
+<div class="advisory">
+
+<h3>🌱 What should I do?</h3>
+
+<div id="aiLoading" class="loading">
+🤖 Generating personalized AI advisory...
+</div>
+
+
+<div id="questions" style="display:none;">
+
+<div class="question">
+
+<button onclick="toggleAnswer('cause',this)">
+1. What caused this?
+<span>+</span>
+</button>
+
+<div id="cause" class="answer"></div>
+
+</div>
+
+
+<div class="question">
+
+<button onclick="toggleAnswer('treatment',this)">
+2. How can I treat it?
+<span>+</span>
+</button>
+
+<div id="treatment" class="answer"></div>
+
+</div>
+
+
+<div class="question">
+
+<button onclick="toggleAnswer('organic',this)">
+3. Can I use an organic treatment?
+<span>+</span>
+</button>
+
+<div id="organic" class="answer"></div>
+
+</div>
+
+
+<div class="question">
+
+<button onclick="toggleAnswer('frequency',this)">
+4. How often should I apply the treatment?
+<span>+</span>
+</button>
+
+<div id="frequency" class="answer"></div>
+
+</div>
+
+
+<div class="question">
+
+<button onclick="toggleAnswer('prevention',this)">
+5. How can I prevent it next season?
+<span>+</span>
+</button>
+
+<div id="prevention" class="answer"></div>
+
+</div>
+
+
+<div class="question">
+
+<button onclick="toggleAnswer('cropRisk',this)">
+6. Is this dangerous for my whole crop?
+<span>+</span>
+</button>
+
+<div id="cropRisk" class="answer"></div>
+
+</div>
+
+</div>
+
+<div id="aiError"></div>
+
+</div>
+
+</div>
+
+</div>
+
+</main>
+
+
+<script>
+
+/* =========================
+IMAGE UPLOAD
+========================= */
+
+const imageInput =
+document.getElementById("imageInput");
+
+const preview =
+document.getElementById("preview");
+
+const analyzeBtn =
+document.getElementById("analyzeBtn");
+
+
+imageInput.addEventListener("change", function() {
+
+const file = this.files[0];
+
+if (!file) return;
+
+const allowed =
+["image/jpeg","image/jpg","image/png"];
+
+if (!allowed.includes(file.type)) {
+
+document.getElementById("uploadError").innerHTML =
+`<div class="error">
+Please upload a JPG or PNG image.
+</div>`;
+
+return;
+}
+
+const reader = new FileReader();
+
+reader.onload = function(e) {
+
+preview.src = e.target.result;
+
+preview.style.display = "block";
+
+document.querySelector(".upload-icon").style.display =
+"none";
+
+document.querySelector(".drop-zone strong").style.display =
+"none";
+
+document.querySelector(".drop-zone p").style.display =
+"none";
+
+analyzeBtn.disabled = false;
+
+};
+
+reader.readAsDataURL(file);
+
+});
+
+
+/* =========================
+ANALYZE IMAGE
+========================= */
+
+async function analyzeImage() {
+
+const file = imageInput.files[0];
+
+if (!file) return;
+
+document.getElementById("uploadError").innerHTML = "";
+
+document.getElementById("predictionLoading").style.display =
+"block";
+
+analyzeBtn.disabled = true;
+
+
+/*
+IMPORTANT:
+
+For now this demo uses a sample prediction.
+
+Later we will connect this part directly
+to your actual crop disease prediction model.
+*/
+
+setTimeout(async () => {
+
+const crop = "Tomato";
+
+const disease = "Septoria leaf spot";
+
+const severity = "Severe";
+
+const confidence = 96;
+
+
+/* SHOW RESULT */
+
+document.getElementById("diseaseTitle").textContent =
+`${crop} — ${disease}`;
+
+document.getElementById("confidence").textContent =
+`${confidence}% confidence · ${severity}`;
+
+document.getElementById("progressBar").style.width =
+confidence + "%";
+
+document.getElementById("resultSection").style.display =
+"block";
+
+document.getElementById("predictionLoading").style.display =
+"none";
+
+
+/* GET AI ADVICE */
+
+await getAIAdvice(
+crop,
+disease,
+severity
+);
+
+analyzeBtn.disabled = false;
+
+document.getElementById("resultSection").scrollIntoView({
+behavior:"smooth"
+});
+
+},1000);
+
+}
+
+
+/* =========================
+GET AI ADVICE
+========================= */
+
+async function getAIAdvice(
+crop,
+disease,
+severity
+) {
+
+document.getElementById("aiLoading").style.display =
+"block";
+
+document.getElementById("questions").style.display =
+"none";
+
+try {
+
+const response =
+await fetch("/api/advice", {
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+crop:crop,
+disease:disease,
+severity:severity
+})
+
+});
+
+
+const data =
+await response.json();
+
+
+if (!response.ok) {
+
+throw new Error(
+data.error || "AI request failed"
+);
+
+}
+
+
+/* INSERT AI ANSWERS */
+
+document.getElementById("cause").textContent =
+data.cause || "No answer available.";
+
+document.getElementById("treatment").textContent =
+data.treatment || "No answer available.";
+
+document.getElementById("organic").textContent =
+data.organic || "No answer available.";
+
+document.getElementById("frequency").textContent =
+data.frequency || "No answer available.";
+
+document.getElementById("prevention").textContent =
+data.prevention || "No answer available.";
+
+document.getElementById("cropRisk").textContent =
+data.cropRisk || "No answer available.";
+
+
+document.getElementById("aiLoading").style.display =
+"none";
+
+document.getElementById("questions").style.display =
+"block";
+
+}
+
+catch(error) {
+
+console.error(error);
+
+document.getElementById("aiLoading").style.display =
+"none";
+
+document.getElementById("aiError").innerHTML =
+`
+<div class="error">
+Could not generate AI advisory.<br>
+${error.message}
+</div>
+`;
+
+}
+
+}
+
+
+/* =========================
+QUESTION TOGGLE
+========================= */
+
+function toggleAnswer(id,button) {
+
+const answer =
+document.getElementById(id);
+
+const icon =
+button.querySelector("span");
+
+
+if(answer.style.display === "block") {
+
+answer.style.display = "none";
+
+icon.textContent = "+";
+
+}
+
+else {
+
+answer.style.display = "block";
+
+icon.textContent = "−";
+
+}
+
+}
+
+
+/* =========================
+CLEAR IMAGE
+========================= */
+
+function clearImage() {
+
+imageInput.value = "";
+
+preview.src = "";
+
+preview.style.display = "none";
+
+document.querySelector(".upload-icon").style.display =
+"block";
+
+document.querySelector(".drop-zone strong").style.display =
+"block";
+
+document.querySelector(".drop-zone p").style.display =
+"block";
+
+analyzeBtn.disabled = true;
+
+document.getElementById("resultSection").style.display =
+"none";
+
+document.getElementById("uploadError").innerHTML =
+"";
+
+document.getElementById("aiError").innerHTML =
+"";
+
+}
+
+
+/* =========================
+SCROLL
+========================= */
+
+function scrollToUpload() {
+
+document.getElementById("uploadSection")
+.scrollIntoView({
+behavior:"smooth"
+});
+
+}
+
+</script>
+
+</body>
+</html>
