@@ -1,3 +1,9 @@
+## 🚀 Live Demo
+
+👉 [Open Verdant AI: ## 🚀 Live Demo
+
+👉 [Open Verdant AI Crop Management](https://ai-based-crop-disease-prediction-system-z01f.onrender.com))
+
 🌿 Verdant — AI-Based Crop Management & Disease Advisory System
 Verdant is an AI-powered crop management system designed to help farmers understand crop diseases and receive practical treatment and prevention advice.
 The system combines a crop disease prediction interface with an AI agricultural advisory system powered by Groq AI.
